@@ -1,0 +1,26 @@
+const { PDFLoader } = require("@langchain/community/document_loaders/fs/pdf");
+
+const loadPdf = async (filePath) => {
+
+    try {
+        const loader = new PDFLoader(filePath);
+
+        const documents = await loader.load();
+
+        if (!documents || documents.length === 0) {
+            throw new Error("PDF loaded but contains no content");
+        }
+
+        console.log(`PDF loaded successfully: ${documents.length} pages`);
+        
+        return documents;
+    } catch (error) {
+        console.error("PDF loading failed:", error.message);
+        throw new Error(`Failed to load PDF: ${error.message}`);
+    }
+
+};
+
+module.exports = {
+    loadPdf
+};
