@@ -36,18 +36,26 @@ const createBatchEmbeddings = async (
     batchSize = 20
 ) => {
 
+    const validChunks = chunks.filter(
+        (chunk) => chunk.pageContent && chunk.pageContent.trim().length > 0
+    );
+
+    if (validChunks.length === 0) {
+        throw new Error("No valid text chunks available for embedding");
+    }
+
     const vectors = [];
 
-    console.log(`Starting batch embedding for ${chunks.length} chunks (batch size: ${batchSize})`);
+    console.log(`Starting batch embedding for ${validChunks.length} chunks (batch size: ${batchSize})`);
 
     for (
         let i = 0;
-        i < chunks.length;
+        i < validChunks.length;
         i += batchSize
     ) {
 
-        const batch = chunks.slice(i, i + batchSize);
-        console.log(`Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunks.length / batchSize)}`);
+        const batch = validChunks.slice(i, i + batchSize);
+        console.log(`Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validChunks.length / batchSize)}`);
 
         const batchVectors = await Promise.all(
 
@@ -74,7 +82,7 @@ const createBatchEmbeddings = async (
         vectors.push(...batchVectors);
 
         console.log(
-            `✓ Batch ${Math.floor(i / batchSize) + 1} completed - ${vectors.length}/${chunks.length} embeddings created`
+            `✓ Batch ${Math.floor(i / batchSize) + 1} completed - ${vectors.length}/${validChunks.length} embeddings created`
         );
     }
 
