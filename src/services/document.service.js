@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const AppError = require("../utils/AppError");
 const documentRepository = require("../repositories/document.repository");
 const { generateFileHash } = require("../utils/hash");
@@ -34,6 +35,7 @@ const uploadDocument = async (file, user, department = null) => {
     } catch (error) {
         await documentRepository.deleteById(document._id);
         await deleteVectors(document._id);
+        try { fs.unlinkSync(file.path); } catch {}
         throw new AppError("Document indexing failed. Please try again.", 500);
     }
 
